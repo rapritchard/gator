@@ -9,7 +9,7 @@ export async function handlerLogin(cmdName: string, ...args: string[]) {
   const user = await getUserByName(username);
 
   if (!user) {
-    throw new Error(`user '${username}' does not exist.`);
+    throw new Error(`user '${username}' does not exist`);
   }
 
   setUser(username);
@@ -29,7 +29,6 @@ export async function handlerRegister(cmdName: string, ...args: string[]) {
     console.info(`INFO: User '${name}' was created.`);
     console.dir(userData, { depth: null, colors: true });
   } catch (e) {
-    console.error(e);
-    process.exit(1);
+    throw new Error(`a user already exists with the username '${name}'`);
   }
 }

@@ -3,9 +3,6 @@ import { CommandsRegistry, registerCommand, runCommand } from "./commands/comman
 import { handlerLogin, handlerRegister } from "./commands/users.js";
 
 async function main() {
-  const registry: CommandsRegistry = {};
-  registerCommand(registry, "login", handlerLogin);
-  registerCommand(registry, "register", handlerRegister);
   const args = argv.slice(2);
 
   if (!args.length) {
@@ -15,7 +12,21 @@ async function main() {
 
   const cmdName = args[0];
   const cmdArgs = args.slice(1);
-  await runCommand(registry, cmdName, ...cmdArgs);
+  const commandsRegistry: CommandsRegistry = {};
+
+  registerCommand(commandsRegistry, "login", handlerLogin);
+  registerCommand(commandsRegistry, "register", handlerRegister);
+
+  try {
+    await runCommand(commandsRegistry, cmdName, ...cmdArgs);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(`Error running command ${cmdName}: ${err.message}`);
+    } else {
+      console.error(`Error running command ${cmdName}: ${err}`);
+    }
+    process.exit(1);
+  }
   process.exit(0);
 }
 
