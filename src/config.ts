@@ -5,15 +5,15 @@ import path from "path";
 export type Config = {
   dbUrl: string;
   currentUserName?: string;
-}
+};
 
 function getConfigFilePath(): string {
   return path.join(os.homedir(), ".gatorconfig.json");
-}
+};
 
 function validateConfig(rawConfig: any): Config {  
   if (!rawConfig.db_url || typeof rawConfig.db_url !== "string") {
-    throw new Error("Config error: A 'db_url' is required.")
+    throw new Error("ERROR: A 'db_url' is required in the .gatorconfig.json")
   }
 
   const cfg: Config = {
@@ -22,7 +22,7 @@ function validateConfig(rawConfig: any): Config {
   };
 
   return cfg;
-}
+};
 
 export function setUser(user: string) {
   const cfg = readConfig();
@@ -37,7 +37,7 @@ function writeConfig(cfg: Config) {
     current_user_name: cfg.currentUserName
   };
   fs.writeFileSync(configFilePath, JSON.stringify(configToSave));
-}
+};
 
 export function readConfig(): Config {
   const configFilePath = getConfigFilePath();
@@ -54,4 +54,4 @@ export function readConfig(): Config {
     console.error(e);
     process.exit(1);
   }
-}
+};
