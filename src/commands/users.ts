@@ -23,12 +23,13 @@ export async function handlerRegister(cmdName: string, ...args: string[]) {
 
   const name = args[0];
 
-  try {
-    const userData = await createUser(name);
-    setUser(userData.name);
-    console.info(`INFO: User '${name}' was created.`);
-    console.dir(userData, { depth: null, colors: true });
-  } catch (e) {
-    throw new Error(`a user already exists with the username '${name}'`);
+  const user = await createUser(name);
+  if (!user) {
+    throw new Error(`user '${name}' does not exist`);
   }
+
+  setUser(user.name);
+
+  console.info(`INFO: User '${name}' was created.`);
+  console.dir(user, { depth: null, colors: true });
 }
