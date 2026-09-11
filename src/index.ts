@@ -1,10 +1,11 @@
 import { argv } from "node:process";
 import { CommandsRegistry, registerCommand, runCommand } from "./commands/commandHandlers.js";
-import { handlerLogin } from "./commands/users.js";
+import { handlerLogin, handlerRegister } from "./commands/users.js";
 
-function main() {
+async function main() {
   const registry: CommandsRegistry = {};
   registerCommand(registry, "login", handlerLogin);
+  registerCommand(registry, "register", handlerRegister);
   const args = argv.slice(2);
 
   if (!args.length) {
@@ -14,7 +15,8 @@ function main() {
 
   const cmdName = args[0];
   const cmdArgs = args.slice(1);
-  runCommand(registry, cmdName, ...cmdArgs);
+  await runCommand(registry, cmdName, ...cmdArgs);
+  process.exit(0);
 }
 
 main();
