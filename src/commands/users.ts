@@ -1,5 +1,5 @@
-import { setUser } from "../config.js";
-import { createUser, getUserByName } from "../lib/db/queries/users.js";
+import { readConfig, setUser } from "../config.js";
+import { createUser, getAllUsers, getUserByName } from "../lib/db/queries/users.js";
 
 export async function handlerLogin(cmdName: string, ...args: string[]) {
   if (!args.length) {
@@ -32,4 +32,18 @@ export async function handlerRegister(cmdName: string, ...args: string[]) {
 
   console.info(`INFO: User '${name}' was created.`);
   console.dir(user, { depth: null, colors: true });
+}
+
+export async function handlerUsers(cmdName: string, ...args: string[]) {
+  const users = await getAllUsers();
+  if (!users) {
+    throw new Error("Error fetching all users");
+  }
+
+  const currentUser = readConfig().currentUserName;
+
+  for (const { name } of users) {
+    const isCurrent = name === currentUser ? " (current)" : "";
+    console.log(`* ${name}${isCurrent}`);
+  }
 }
