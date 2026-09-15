@@ -48,5 +48,8 @@ export async function handlerAddFeed(cmdName: string, ...args: string[]) {
   const [name, url] = args;
 
   const feed = await createFeed(name, url, userData.id);
+  if (!feed) {
+    throw new Error("Failed to create feed: no record returned");
+  }
   printFeed(feed, userData);
 }

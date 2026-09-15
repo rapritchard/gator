@@ -1,6 +1,7 @@
 import { eq, type InferSelectModel } from "drizzle-orm";
 import { db } from "../index.js";
-import { feeds, users } from "../schema.js";
+import { feedFollows, feeds, users } from "../schema.js";
+import { firstOrUndefined } from "../utils.js";
 
 export type Feed = typeof feeds.$inferSelect;
 
@@ -9,7 +10,15 @@ export async function createFeed(name: string, url: string, userId: string) {
     .insert(feeds)
     .values({ name: name, url: url, user_id: userId })
     .returning();
+
+  await db.insert(feedFollows).values({ user_id: userId, feed_id: result.id }).returning();
+
   return result;
+}
+
+export async function getFeed(url: string) {
+  const results = await db.select().from(feeds).where(eq(feeds.url, url));
+  return firstOrUndefined(results);
 }
 
 export async function getFeeds() {
