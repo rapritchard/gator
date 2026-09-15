@@ -1,5 +1,5 @@
 import { readConfig } from "../config.js";
-import { createFeed } from "../lib/db/queries/feeds.js";
+import { createFeed, getFeeds } from "../lib/db/queries/feeds.js";
 import { getUserByName } from "../lib/db/queries/users.js";
 import { fetchFeed } from "../lib/rss/index.js";
 import { printFeed } from "../lib/rss/utils.js";
@@ -14,6 +14,18 @@ export async function handlerAgg(cmdName: string, ...args: string[]) {
   const rssFeed = await fetchFeed("https://www.wagslane.dev/index.xml");
 
   console.dir(rssFeed, { depth: null, colors: true });
+}
+
+export async function handlerFeeds(cmdName: string, ...args: string[]) {
+  const feeds = await getFeeds();
+
+  if (!feeds.length) {
+    throw new Error("No feeds found");
+  }
+
+  for (const feed of feeds) {
+    console.dir(feed);
+  }
 }
 
 export async function handlerAddFeed(cmdName: string, ...args: string[]) {
