@@ -1,4 +1,8 @@
-import { createFeedFollow, getFeedFollowsForUser } from "../lib/db/queries/feedFollows.js";
+import {
+  createFeedFollow,
+  deleteFeedFollow,
+  getFeedFollowsForUser,
+} from "../lib/db/queries/feedFollows.js";
 import { getFeed } from "../lib/db/queries/feeds.js";
 import { type User } from "../lib/db/queries/users.js";
 
@@ -22,6 +26,26 @@ export async function handlerFollow(cmdName: string, user: User, ...args: string
   }
 
   console.dir(feedFollow);
+}
+
+export async function handlerUnfollow(cmdName: string, user: User, ...args: string[]) {
+  if (!args.length) {
+    throw new Error(`The ${cmdName} command expects 1 argument: <feedURL>`);
+  }
+
+  const [url] = args;
+
+  const feed = await getFeed(url);
+  if (!feed) {
+    throw new Error(`No feed found for the given URL: ${url}`);
+  }
+
+  const unfollowFeed = await deleteFeedFollow(user.id, feed.id);
+  if (!unfollowFeed) {
+    throw new Error(`You do not follow a feed with the given URL: ${url}`);
+  }
+
+  console.log(`${feed.name} successfully unfollowed`);
 }
 
 export async function handlerFollowing(cmdName: string, user: User, ...args: string[]) {

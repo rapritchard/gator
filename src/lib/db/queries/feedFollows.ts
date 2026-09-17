@@ -1,4 +1,4 @@
-import { eq, type InferSelectModel } from "drizzle-orm";
+import { and, eq, type InferSelectModel } from "drizzle-orm";
 import { db } from "../index.js";
 import { feedFollows, feeds, users } from "../schema.js";
 
@@ -25,6 +25,13 @@ export async function createFeedFollow(userId: string, feedId: string) {
     .where(eq(feedFollows.id, newFeedFollow.id));
 
   return result;
+}
+
+export async function deleteFeedFollow(userId: string, feedId: string) {
+  return await db
+    .delete(feedFollows)
+    .where(and(eq(feedFollows.user_id, userId), eq(feedFollows.feed_id, feedId)))
+    .returning();
 }
 
 export async function getFeedFollowsForUser(userId: string) {
