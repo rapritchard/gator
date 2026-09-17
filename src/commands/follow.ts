@@ -1,21 +1,8 @@
-import { readConfig } from "../config.js";
 import { createFeedFollow, getFeedFollowsForUser } from "../lib/db/queries/feedFollows.js";
 import { getFeed } from "../lib/db/queries/feeds.js";
-import { getUserByName } from "../lib/db/queries/users.js";
+import { type User } from "../lib/db/queries/users.js";
 
-export async function handlerFollow(cmdName: string, ...args: string[]) {
-  const user = readConfig();
-
-  if (!user?.currentUserName) {
-    throw new Error("You must be logged in to add a feed");
-  }
-
-  const userData = await getUserByName(user.currentUserName);
-
-  if (!userData) {
-    throw new Error(`User ${user.currentUserName} not found`);
-  }
-
+export async function handlerFollow(cmdName: string, user: User, ...args: string[]) {
   if (!args.length) {
     throw new Error(`The ${cmdName} command expects 1 argument: <feedURL>`);
   }
@@ -28,7 +15,7 @@ export async function handlerFollow(cmdName: string, ...args: string[]) {
     throw new Error(`No feed found for the given URL: ${url}`);
   }
 
-  const feedFollow = await createFeedFollow(userData.id, feed.id);
+  const feedFollow = await createFeedFollow(user.id, feed.id);
 
   if (!feedFollow) {
     throw new Error("Failed to create feed follow: no record returned");
@@ -37,26 +24,14 @@ export async function handlerFollow(cmdName: string, ...args: string[]) {
   console.dir(feedFollow);
 }
 
-export async function handlerFollowing(cmdName: string, ...args: string[]) {
-  const user = readConfig();
-
-  if (!user?.currentUserName) {
-    throw new Error("You must be logged in to add a feed");
-  }
-
-  const userData = await getUserByName(user.currentUserName);
-
-  if (!userData) {
-    throw new Error(`User ${user.currentUserName} not found`);
-  }
-
-  const results = await getFeedFollowsForUser(userData.id);
+export async function handlerFollowing(cmdName: string, user: User, ...args: string[]) {
+  const results = await getFeedFollowsForUser(user.id);
 
   if (!results) {
-    throw new Error(`User ${userData.name} follows no feeds`);
+    throw new Error(`User ${user.name} follows no feeds`);
   }
 
-  console.log(`Feeds ${userData.name} follows:`);
+  console.log(`Feeds ${user.name} follows:`);
   for (const r of results) {
     console.log(` - ${r.name}`);
   }
