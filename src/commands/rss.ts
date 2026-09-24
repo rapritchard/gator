@@ -1,4 +1,5 @@
 import { createFeed, getFeeds } from "../lib/db/queries/feeds.js";
+import { getPostsForUser } from "../lib/db/queries/posts.js";
 import { type User } from "../lib/db/queries/users.js";
 import { fetchFeed, scrapeFeeds } from "../lib/rss/index.js";
 import { formatDuration, parseDuration, printFeed } from "../lib/rss/utils.js";
@@ -34,6 +35,28 @@ export async function handlerAgg(cmdName: string, ...args: string[]) {
       resolve();
     });
   });
+}
+
+export async function handlerBrowse(cmdName: string, user: User, ...args: string[]) {
+  let limit = 2;
+
+  if (args.length) {
+    if (Number.isNaN(Number(args[0]))) {
+      throw new Error(`The ${cmdName} command expects argument <limit> to be a number`);
+    }
+    limit = Number(args[0]);
+  }
+
+  const posts = await getPostsForUser(user.id, limit);
+
+  for (const post of posts) {
+    const publishedAt = new Date(post.publishedAt);
+    console.log(` - ${post.feedName} | ${post.title}`);
+    console.log(`  - ${publishedAt.toLocaleString()}`);
+    if (post.description) {
+      console.log(`  - ${post.description}`);
+    }
+  }
 }
 
 export async function handlerFeeds(cmdName: string, ...args: string[]) {

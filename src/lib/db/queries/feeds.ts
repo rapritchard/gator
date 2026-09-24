@@ -8,10 +8,10 @@ export type Feed = typeof feeds.$inferSelect;
 export async function createFeed(name: string, url: string, userId: string) {
   const [result] = await db
     .insert(feeds)
-    .values({ name: name, url: url, user_id: userId })
+    .values({ name: name, url: url, userId: userId })
     .returning();
 
-  await db.insert(feedFollows).values({ user_id: userId, feed_id: result.id }).returning();
+  await db.insert(feedFollows).values({ userId: userId, feedId: result.id }).returning();
 
   return result;
 }
@@ -29,7 +29,7 @@ export async function getFeeds() {
       userName: users.name,
     })
     .from(feeds)
-    .innerJoin(users, eq(users.id, feeds.user_id));
+    .innerJoin(users, eq(users.id, feeds.userId));
 }
 
 export async function markFeedFetched(id: string) {

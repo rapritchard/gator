@@ -1,5 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { Feed, getNextFeedToFetch, markFeedFetched } from "../db/queries/feeds.js";
+import { createPost } from "../db/queries/posts.js";
 import type { RSSFeed, RSSItem } from "./types.js";
 
 export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
@@ -86,7 +87,10 @@ export async function scrapeFeeds() {
   console.log(feed.channel.title);
   console.log("-----------");
   for (const item of feed.channel.item) {
-    console.log(item.title);
+    const publishedAt = new Date(item.pubDate);
+    console.log(` - Saving post ${item.title}`);
+    console.log(`   - published: ${publishedAt}`);
+    await createPost(item.title, item.link, publishedAt, nextFeed.id, item.description);
   }
   console.log("-----------");
 }

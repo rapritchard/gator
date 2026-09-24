@@ -2,7 +2,7 @@ import { argv } from "node:process";
 import { CommandsRegistry, registerCommand, runCommand } from "./commands/commandHandlers.js";
 import { handlerFollow, handlerFollowing, handlerUnfollow } from "./commands/follow.js";
 import { handlerReset } from "./commands/reset.js";
-import { handlerAddFeed, handlerAgg, handlerFeeds } from "./commands/rss.js";
+import { handlerAddFeed, handlerAgg, handlerBrowse, handlerFeeds } from "./commands/rss.js";
 import { handlerLogin, handlerRegister, handlerUsers } from "./commands/users.js";
 import { middlewareLoggedIn } from "./lib/middleware/loggedIn.js";
 
@@ -28,6 +28,7 @@ async function main() {
   registerCommand(commandsRegistry, "follow", middlewareLoggedIn(handlerFollow));
   registerCommand(commandsRegistry, "following", middlewareLoggedIn(handlerFollowing));
   registerCommand(commandsRegistry, "unfollow", middlewareLoggedIn(handlerUnfollow));
+  registerCommand(commandsRegistry, "browse", middlewareLoggedIn(handlerBrowse));
 
   try {
     await runCommand(commandsRegistry, cmdName, ...cmdArgs);

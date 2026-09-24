@@ -36,6 +36,13 @@
       "when": 1790239486918,
       "tag": "0004_smiling_fallen_one",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790246699095,
+      "tag": "0005_wild_ikaris",
+      "breakpoints": true
     }
   ]
 }
