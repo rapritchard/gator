@@ -68,8 +68,8 @@ For example:
 
 ```bash
 npm run start -- register alice
-npm run start -- addfeed "Boot.dev Blog" https://blog.boot.dev/index.xml
-npm run start -- follow https://blog.boot.dev/index.xml
+npm run start -- addfeed "TechCrunch" "https://techcrunch.com/feed/"
+npm run start -- follow "https://blog.boot.dev/index.xml"
 npm run start -- agg 1m
 npm run start -- browse 10
 ```
