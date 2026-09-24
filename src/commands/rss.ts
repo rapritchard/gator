@@ -42,7 +42,7 @@ export async function handlerBrowse(cmdName: string, user: User, ...args: string
 
   if (args.length) {
     if (Number.isNaN(Number(args[0]))) {
-      throw new Error(`The ${cmdName} command expects argument <limit> to be a number`);
+      throw new Error(`The ${cmdName} command expects argument [limit] to be a number`);
     }
     limit = Number(args[0]);
   }
