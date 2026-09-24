@@ -1,4 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
+import { Feed, getNextFeedToFetch, markFeedFetched } from "../db/queries/feeds.js";
 import type { RSSFeed, RSSItem } from "./types.js";
 
 export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
@@ -66,4 +67,26 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
   };
 
   return rssFeed;
+}
+
+export async function scrapeFeeds() {
+  const nextFeed = await getNextFeedToFetch();
+
+  if (!nextFeed) {
+    throw new Error("No feeds in database");
+  }
+
+  const feed = await fetchFeed(nextFeed.url);
+
+  if (!feed) {
+    throw new Error(`Error fetching feed ${nextFeed.url}`);
+  }
+
+  await markFeedFetched(nextFeed.id);
+  console.log(feed.channel.title);
+  console.log("-----------");
+  for (const item of feed.channel.item) {
+    console.log(item.title);
+  }
+  console.log("-----------");
 }

@@ -1,18 +1,39 @@
 import { createFeed, getFeeds } from "../lib/db/queries/feeds.js";
 import { type User } from "../lib/db/queries/users.js";
-import { fetchFeed } from "../lib/rss/index.js";
-import { printFeed } from "../lib/rss/utils.js";
+import { fetchFeed, scrapeFeeds } from "../lib/rss/index.js";
+import { formatDuration, parseDuration, printFeed } from "../lib/rss/utils.js";
 
 export async function handlerAgg(cmdName: string, ...args: string[]) {
   if (!args.length) {
-    throw new Error(`The ${cmdName} command expects 1 argument: <feedURL>`);
+    throw new Error(`The ${cmdName} command expects 1 argument: <time_between_reqs>`);
   }
 
-  const feedURL = args[0];
+  const duration = args[0];
+  const requestInterval = parseDuration(duration);
 
-  const rssFeed = await fetchFeed("https://www.wagslane.dev/index.xml");
+  console.log(`Collecting feeds every ${formatDuration(requestInterval)}`);
 
-  console.dir(rssFeed, { depth: null, colors: true });
+  const handleError = (err: unknown) => {
+    if (err instanceof Error) {
+      console.error(`Error aggregating feed: ${err.message}`);
+    } else {
+      console.error(`Error aggregating feed: ${err}`);
+    }
+  };
+
+  scrapeFeeds().catch(handleError);
+
+  const interval = setInterval(() => {
+    scrapeFeeds().catch(handleError);
+  }, requestInterval);
+
+  await new Promise<void>((resolve) => {
+    process.on("SIGINT", () => {
+      console.log("Shutting down feed aggregator...");
+      clearInterval(interval);
+      resolve();
+    });
+  });
 }
 
 export async function handlerFeeds(cmdName: string, ...args: string[]) {
